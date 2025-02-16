@@ -24,12 +24,31 @@
 	const positions: Map<Vehicle, DrawingData> = new SvelteMap();
 
 	setInterval(() => {
-		for (const vehicle of traffic.vehicles) {
+		for (let v = 0; v < traffic.vehicles.length; v++) {
+			const vehicle = traffic.vehicles[v];
+			const aheadVehicle =
+				traffic.vehicles.length < 2
+					? undefined
+					: v > 0
+						? traffic.vehicles[v - 1]
+						: traffic.vehicles.at(-1);
+
 			const currentStatus = vehicle.getStatus();
 			const currentPoint = traffic.route.getPathPoint(currentStatus.position);
 
 			vehicle.move(
-				{ distance: 100, speed: 100 },
+				aheadVehicle
+					? {
+							distance:
+								(aheadVehicle.getStatus().position +
+									aheadVehicle.getStatus().carDescriptor.shape.length -
+									currentStatus.position -
+									currentStatus.carDescriptor.shape.length +
+									pathLength) %
+								pathLength,
+							speed: aheadVehicle.getStatus().speed
+						}
+					: { distance: 1000, speed: 1000 },
 				{ radius: currentPoint.radius },
 				currentPoint.nextCurve,
 				timeScale

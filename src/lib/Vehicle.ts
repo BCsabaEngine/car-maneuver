@@ -18,8 +18,11 @@ export class Vehicle {
 	constructor(
 		private carType: VehicleType,
 		private color: string,
-		private driveParameters: DriveParameters
-	) {}
+		private driveParameters: DriveParameters,
+		initPorition = 0
+	) {
+		this.position = initPorition;
+	}
 
 	public getStatus = (): VehicleStatus => ({
 		position: Math.trunc(this.position),
@@ -52,7 +55,16 @@ export class Vehicle {
 		this.speed += this.acceleration * elapsedSec;
 
 		const targetSpeeds = [this.driveParameters.maxSpeed];
-		if (ahead.distance < this.speed) targetSpeeds.push(ahead.speed);
+		if (
+			ahead.speed < this.speed &&
+			ahead.distance <
+				Math.max(
+					this.speed ** 2 / (2 * this.driveParameters.maxBreak),
+					vehicleDescriptors[this.carType].shape.length
+				) *
+					2
+		)
+			targetSpeeds.push(ahead.speed);
 		if (currentCurve.radius) targetSpeeds.push(currentCurve.radius);
 		if (
 			nextCurve &&
