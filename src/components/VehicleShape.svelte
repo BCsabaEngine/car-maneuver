@@ -19,9 +19,9 @@
 	rotation={drawingData.point.angle}
 	sceneFunc={(context) => {
 		context.beginPath();
-		context.moveTo(-7, 0);
-		context.lineTo(3, 0);
-		context.lineWidth = 2.5;
+		context.moveTo(-drawingData.carDescriptor.shape.length / 2, 0);
+		context.lineTo(drawingData.carDescriptor.shape.length / 2, 0);
+		context.lineWidth = drawingData.carDescriptor.shape.width;
 		context.strokeStyle = drawingData.color;
 		context.stroke();
 	}}

@@ -4,7 +4,7 @@
 	import { DegToRad } from '$lib/Math';
 	import type { Route } from '$lib/Route';
 
-	const ROADWIDTH_METER = 10;
+	const ROADWIDTH_METER = 7;
 	const ROADBORDER_PX = 2;
 
 	interface Properties {

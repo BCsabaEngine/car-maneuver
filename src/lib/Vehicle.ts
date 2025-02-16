@@ -1,19 +1,11 @@
-import type { CarDescriptor, CarType, VehicleStatus } from '$types/VehicleTypes';
+import type { VehicleStatus, VehicleType } from '$types/VehicleTypes';
 
 import { MathMinMax } from './Math';
+import { vehicleDescriptors } from './vehicleDescriptors';
 
 type DriveParameters = {
 	maxSpeed: number;
 	maxAcceleration: number;
-};
-
-const carDescriptors: Record<CarType, CarDescriptor> = {
-	car: {
-		engineBreakAcceleration: 1
-	},
-	truck: {
-		engineBreakAcceleration: 1
-	}
 };
 
 export class Vehicle {
@@ -22,7 +14,7 @@ export class Vehicle {
 	private acceleration = 0;
 
 	constructor(
-		private carType: CarType,
+		private carType: VehicleType,
 		private color: string,
 		private driveParameters: DriveParameters
 	) {}
@@ -31,9 +23,9 @@ export class Vehicle {
 		position: this.position,
 		speed: this.speed,
 		carType: this.carType,
-		carDescriptor: carDescriptors[this.carType],
+		carDescriptor: vehicleDescriptors[this.carType],
 		color: this.color,
-		isBreaking: this.acceleration < -carDescriptors[this.carType].engineBreakAcceleration
+		isBreaking: this.acceleration < -vehicleDescriptors[this.carType].engine.breakAcceleration
 	});
 
 	private lastMove = Date.now();
@@ -53,7 +45,7 @@ export class Vehicle {
 		(this.acceleration = this.driveParameters.maxAcceleration * MathMinMax(ratio, 0, 1));
 
 	private release = () =>
-		(this.acceleration = -carDescriptors[this.carType].engineBreakAcceleration);
+		(this.acceleration = -vehicleDescriptors[this.carType].engine.breakAcceleration);
 
 	private break = (ratio = 1) =>
 		(this.acceleration = -this.driveParameters.maxAcceleration * MathMinMax(ratio, 0, 1));

@@ -1,16 +1,22 @@
 import type { RoutePoint } from './RouteTypes';
 
-export type CarType = 'car' | 'truck';
+export type VehicleType = 'car' | 'truck';
 
-export type CarDescriptor = {
-	engineBreakAcceleration: number;
+export type VehicleDescriptor = {
+	engine: {
+		breakAcceleration: number;
+	};
+	shape: {
+		width: number;
+		length: number;
+	};
 };
 
 export type VehicleStatus = {
 	position: number;
 	speed: number;
-	carType: CarType;
-	carDescriptor: CarDescriptor;
+	carType: VehicleType;
+	carDescriptor: VehicleDescriptor;
 	color: string;
 	isBreaking: boolean;
 };
