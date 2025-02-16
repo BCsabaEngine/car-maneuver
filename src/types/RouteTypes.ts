@@ -6,6 +6,12 @@ export type RouteStartPoint = {
 
 export type RoutePoint = RouteStartPoint & {
 	radius: number;
+	nextCurve:
+		| {
+				distance: number;
+				radius: number;
+		  }
+		| undefined;
 };
 
 export type RoutePath =

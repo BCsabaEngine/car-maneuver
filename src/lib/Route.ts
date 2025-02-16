@@ -28,9 +28,21 @@ export class Route {
 		public path: RoutePath[]
 	) {
 		this.pathLengthCache = Math.trunc(this.calcTotalPathLength());
+
 		for (let d = 0; d < this.pathLengthCache; d++)
 			this.pathPointsCache.push(this.calcPositionOnPath(d));
+		for (let d = 0; d < this.pathLengthCache; d++)
+			for (let n = d + 1; n < this.pathLengthCache * 2; n++) {
+				const nPoint = this.pathPointsCache[n % this.pathLengthCache];
+				const dPoint = this.pathPointsCache[d];
+				if (nPoint.radius != 0 && (dPoint.radius === 0 || nPoint.radius < dPoint.radius)) {
+					dPoint.nextCurve = { distance: n - d, radius: nPoint.radius };
+					break;
+				}
+			}
+
 		this.boundingBoxCache = this.calculateBoundingBox();
+
 		this.elementsToDrawCache = this.getPathElementsToDraw();
 	}
 
@@ -77,7 +89,7 @@ export class Route {
 					if (remainingDistance <= segment.length) {
 						x += remainingDistance * Math.cos(DegToRad(angle));
 						y += remainingDistance * Math.sin(DegToRad(angle));
-						return { x, y, angle, radius: 0 };
+						return { x, y, angle, radius: 0, nextCurve: undefined };
 					}
 					x += segment.length * Math.cos(DegToRad(angle));
 					y += segment.length * Math.sin(DegToRad(angle));
@@ -96,7 +108,7 @@ export class Route {
 						angle += thetaDeg * Math.sign(segment.angle);
 						x = cx + segment.radius * Math.cos(DegToRad(angle - 90 * (anticlockwise ? -1 : 1)));
 						y = cy + segment.radius * Math.sin(DegToRad(angle - 90 * (anticlockwise ? -1 : 1)));
-						return { x, y, angle, radius: segment.radius };
+						return { x, y, angle, radius: segment.radius, nextCurve: undefined };
 					}
 
 					angle += segment.angle;
@@ -107,7 +119,7 @@ export class Route {
 				}
 			}
 		}
-		return { x, y, angle, radius };
+		return { x, y, angle, radius, nextCurve: undefined };
 	}
 
 	private calculateBoundingBox() {

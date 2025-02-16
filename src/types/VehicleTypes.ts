@@ -15,6 +15,7 @@ export type VehicleDescriptor = {
 export type VehicleStatus = {
 	position: number;
 	speed: number;
+	targetSpeed: number;
 	carType: VehicleType;
 	carDescriptor: VehicleDescriptor;
 	color: string;
