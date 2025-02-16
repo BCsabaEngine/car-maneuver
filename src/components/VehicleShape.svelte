@@ -24,5 +24,13 @@
 		context.lineWidth = drawingData.carDescriptor.shape.width;
 		context.strokeStyle = drawingData.color;
 		context.stroke();
+		if (drawingData.isBreaking) {
+			context.beginPath();
+			context.moveTo(-drawingData.carDescriptor.shape.length / 2, 0);
+			context.lineTo(-drawingData.carDescriptor.shape.length / 2 + 1, 0);
+			context.lineWidth = drawingData.carDescriptor.shape.width;
+			context.strokeStyle = 'red';
+			context.stroke();
+		}
 	}}
 />
