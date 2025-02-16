@@ -19,6 +19,7 @@
 	const pathLength = traffic.route.pathLength;
 
 	let zoom = $state(100);
+	let timeScale = $state(100);
 
 	const positions: Map<Vehicle, DrawingData> = new SvelteMap();
 
@@ -27,7 +28,12 @@
 			const currentStatus = vehicle.getStatus();
 			const currentPoint = traffic.route.getPathPoint(currentStatus.position);
 
-			vehicle.move({ distance: 100, speed: 100 }, { radius: currentPoint.radius });
+			vehicle.move(
+				{ distance: 100, speed: 100 },
+				{ radius: currentPoint.radius },
+				currentPoint.nextCurve,
+				timeScale
+			);
 
 			const updatedStatus = vehicle.getStatus();
 			positions.set(vehicle, {
@@ -43,9 +49,15 @@
 	};
 </script>
 
-<div class="flex justify-center my-4">
-	<ZoomRange class="w-2/5" bind:value={zoom} min={10} max={300} step={10} />
+<div class="grid grid-cols-2">
+	<div class="flex justify-center my-4">
+		<ZoomRange class="w-3/5" bind:value={zoom} min={10} max={300} step={10} />
+	</div>
+	<div class="flex justify-center my-4">
+		<ZoomRange class="w-3/5" bind:value={timeScale} title="Speed" min={10} max={100} step={10} />
+	</div>
 </div>
+
 <div class="flex justify-center my-4">
 	{pathLength} m in {box.width} x {box.height} m
 </div>
@@ -75,11 +87,13 @@
 		</Layer>
 	</Stage>
 </div>
+
 <div class="absolute top-0 left-0 p-4">
 	<Card class="w-48 " shadow={false}>
 		{#each positions.values() as vehicle}
-			<span style={`color: ${vehicle.color}`} class="flex flex-row gap-1 items-center"
-				>{vehicle.speed} <span class="text-xs">m/sec</span>
+			<span style={`color: ${vehicle.color}`} class="flex flex-row gap-1 items-center">
+				{vehicle.speed}
+				<span class="text-xs">m/sec</span>
 				{#if vehicle.isAccelerating}
 					<Icon icon="mdi:arrow-up" width="16" />
 				{:else if vehicle.isBreaking}
@@ -89,6 +103,7 @@
 		{/each}
 	</Card>
 </div>
+
 <div class="absolute top-0 right-0 p-4">
 	<Button
 		class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"

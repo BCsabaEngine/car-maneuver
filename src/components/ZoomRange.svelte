@@ -6,6 +6,7 @@
 	let aClass = '';
 	export { aClass as class };
 
+	export let title: string = 'Zoom';
 	export let value: number = DEFAULT_VALUE;
 	export let min: number = 0;
 	export let max: number = 100;
@@ -18,7 +19,7 @@
 		title="Reset zoom"
 		onclick={() => {
 			value = 100;
-		}}>Zoom: <span class="font-semibold">{value}</span>%</Label
+		}}>{title}: <span class="font-semibold">{value}</span>%</Label
 	>
 	<Range {min} {max} {step} bind:value id="imageZoom" />
 </div>

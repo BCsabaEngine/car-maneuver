@@ -12,6 +12,7 @@ type DriveParameters = {
 export class Vehicle {
 	private position = 0;
 	private speed = 0;
+	private targetSpeed = 0;
 	private acceleration = 0;
 
 	constructor(
@@ -23,6 +24,7 @@ export class Vehicle {
 	public getStatus = (): VehicleStatus => ({
 		position: Math.trunc(this.position),
 		speed: Math.trunc(this.speed),
+		targetSpeed: Math.trunc(this.targetSpeed),
 		carType: this.carType,
 		carDescriptor: vehicleDescriptors[this.carType],
 		color: this.color,
@@ -37,24 +39,35 @@ export class Vehicle {
 	}
 
 	private lastMove = Date.now();
-	public move(ahead: { distance: number; speed: number }, curve: { radius?: number }) {
-		const elapsedSec = (Date.now() - this.lastMove) / 1000;
+	public move(
+		ahead: { distance: number; speed: number },
+		currentCurve: { radius?: number },
+		nextCurve: { distance: number; radius: number } | undefined,
+		timeScalePercent: number
+	) {
+		const elapsedSec = ((Date.now() - this.lastMove) / 1000) * (timeScalePercent / 100);
 		this.lastMove = Date.now();
 
 		this.position += this.speed * elapsedSec;
 		this.speed += this.acceleration * elapsedSec;
 
-		let targetSpeed = this.driveParameters.maxSpeed;
-		if (ahead.distance < this.speed) targetSpeed = ahead.speed;
-		if (curve.radius) {
-			targetSpeed = Math.min(targetSpeed, curve.radius);
-			targetSpeed = Math.min(targetSpeed, this.speed);
-		}
+		const targetSpeeds = [this.driveParameters.maxSpeed];
+		if (ahead.distance < this.speed) targetSpeeds.push(ahead.speed);
+		if (currentCurve.radius) targetSpeeds.push(currentCurve.radius, this.speed);
+		if (
+			nextCurve &&
+			nextCurve.distance <
+				(this.speed ** 2 - nextCurve.radius ** 2) / (2 * this.driveParameters.maxBreak)
+		)
+			targetSpeeds.push(nextCurve.radius);
 
-		if (this.speed === targetSpeed) this.hold();
-		else if (this.speed < targetSpeed) this.accelerate(this.speed < targetSpeed / 2 ? 1 : 0.75);
+		this.targetSpeed = Math.min(...targetSpeeds);
+
+		if (this.speed === this.targetSpeed) this.hold();
+		else if (this.speed < this.targetSpeed)
+			this.accelerate(this.speed < this.targetSpeed / 2 ? 1 : 0.75);
 		else {
-			if (this.speed > targetSpeed * 1.05) this.break();
+			if (this.speed > this.targetSpeed * 1.05) this.break();
 			else this.release();
 		}
 	}

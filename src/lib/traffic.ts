@@ -17,5 +17,5 @@ export const traffic = {
 		{ type: 'arc', radius: 50, angle: 90 },
 		{ type: 'line', length: 71 }
 	]),
-	vehicles: [new Vehicle('car', '#4c4', { maxSpeed: 100, maxAcceleration: 5, maxBreak: 20 })]
+	vehicles: [new Vehicle('car', '#4c4', { maxSpeed: 100, maxAcceleration: 25, maxBreak: 25 })]
 };
