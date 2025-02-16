@@ -1,11 +1,17 @@
 <script lang="ts">
 	import './app.postcss';
 
+	import Icon from '@iconify/svelte';
+	import { Button, Card } from 'flowbite-svelte';
+	import { SvelteMap } from 'svelte/reactivity';
 	import { Layer, Rect, Stage } from 'svelte-konva';
 
-	import Road from '$components/Road.svelte';
+	import RoadShape from '$components/RoadShape.svelte';
+	import VehicleShape from '$components/VehicleShape.svelte';
 	import ZoomRange from '$components/ZoomRange.svelte';
 	import { traffic } from '$lib/traffic';
+	import type { Vehicle } from '$lib/Vehicle';
+	import type { DrawingData } from '$types/VehicleTypes';
 
 	const PIXEL_PER_METER = 2;
 
@@ -13,6 +19,28 @@
 	const pathLength = traffic.route.pathLength;
 
 	let zoom = $state(100);
+
+	const positions: Map<Vehicle, DrawingData> = new SvelteMap();
+
+	setInterval(() => {
+		for (const vehicle of traffic.vehicles) {
+			const currentStatus = vehicle.getStatus();
+			const currentPoint = traffic.route.getPathPoint(currentStatus.position);
+
+			vehicle.move({ distance: 100, speed: 100 }, { radius: currentPoint.radius });
+
+			const updatedStatus = vehicle.getStatus();
+			positions.set(vehicle, {
+				...updatedStatus,
+				point: traffic.route.getPathPoint(updatedStatus.position)
+			});
+		}
+	}, 10);
+
+	const resetVehicles = () => {
+		positions.clear();
+		for (const vehicle of traffic.vehicles) vehicle.reset();
+	};
 </script>
 
 <div class="flex justify-center my-4">
@@ -40,14 +68,39 @@
 				fill="#7a7"
 				stroke="#888"
 			/>
-			<Road route={traffic.route} pixelPerMeter={PIXEL_PER_METER} showPath />
+			<RoadShape route={traffic.route} pixelPerMeter={PIXEL_PER_METER} />
+			{#each positions.values() as drawingData}
+				<VehicleShape {drawingData} pixelPerMeter={PIXEL_PER_METER} />
+			{/each}
 		</Layer>
 	</Stage>
+</div>
+<div class="absolute top-0 left-0 p-4">
+	<Card class="w-48 " shadow={false}>
+		{#each positions.values() as vehicle}
+			<span style={`color: ${vehicle.color}`} class="flex flex-row gap-1 items-center"
+				>{vehicle.speed} <span class="text-xs">m/sec</span>
+				{#if vehicle.isAccelerating}
+					<Icon icon="mdi:arrow-up" width="16" />
+				{:else if vehicle.isBreaking}
+					<Icon icon="mdi:arrow-down" width="16" />
+				{/if}
+			</span>
+		{/each}
+	</Card>
+</div>
+<div class="absolute top-0 right-0 p-4">
+	<Button
+		class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+		on:click={resetVehicles}
+	>
+		Reset
+	</Button>
 </div>
 
 <style>
 	:global(body) {
-		background-color: #f3f4f6;
+		background-color: #f3f3f3;
 	}
 
 	:global(button) {

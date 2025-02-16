@@ -8,5 +8,5 @@ export const MathMax = (values: number[]): number => {
 export const MathMinMax = (value: number, min: number, max: number) =>
 	Math.max(Math.min(value, max), min);
 
-export const degToRad = (deg: number) => (deg * Math.PI) / 180;
-export const radToDeg = (rad: number) => (rad * 180) / Math.PI;
+export const DegToRad = (deg: number) => (deg * Math.PI) / 180;
+export const RadToDeg = (rad: number) => (rad * 180) / Math.PI;

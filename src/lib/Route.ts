@@ -1,6 +1,6 @@
-import type { Path, Point } from '$types/Path';
+import type { RoutePath, RoutePoint, RouteStartPoint } from '$types/RouteTypes';
 
-import { degToRad, radToDeg } from './Math';
+import { DegToRad, RadToDeg } from './Math';
 
 const MARGIN_METER = 30;
 
@@ -20,12 +20,12 @@ type RouteElementToDraw =
 export class Route {
 	private boundingBoxCache: { minX: number; minY: number; maxX: number; maxY: number };
 	private pathLengthCache: number;
-	private pathPointsCache: Point[] = [];
+	private pathPointsCache: RoutePoint[] = [];
 	private elementsToDrawCache: RouteElementToDraw[];
 
 	constructor(
-		public startPoint: Point,
-		public path: Path
+		public startPoint: RouteStartPoint,
+		public path: RoutePath[]
 	) {
 		this.pathLengthCache = Math.trunc(this.calcTotalPathLength());
 		for (let d = 0; d < this.pathLengthCache; d++)
@@ -39,7 +39,7 @@ export class Route {
 		return this.pathLengthCache;
 	}
 
-	public getPathPoint(distance: number): Point {
+	public getPathPoint(distance: number): RoutePoint {
 		return this.pathPointsCache[Math.trunc(distance % this.pathLengthCache)];
 	}
 
@@ -60,51 +60,54 @@ export class Route {
 	private calcTotalPathLength = (): number =>
 		this.path.reduce(
 			(sum, seg) =>
-				sum + (seg.type === 'line' ? seg.length : Math.abs(seg.radius * degToRad(seg.angle))),
+				sum + (seg.type === 'line' ? seg.length : Math.abs(seg.radius * DegToRad(seg.angle))),
 			0
 		);
 
-	private calcPositionOnPath(distance: number): Point {
+	private calcPositionOnPath(distance: number): RoutePoint {
 		let remainingDistance = distance % this.calcTotalPathLength();
 		let x = this.startPoint.x,
 			y = this.startPoint.y,
-			angle = this.startPoint.angle;
+			angle = this.startPoint.angle,
+			radius = 0;
 
 		while (remainingDistance > 0) {
 			for (const segment of this.path) {
 				if (segment.type === 'line') {
 					if (remainingDistance <= segment.length) {
-						x += remainingDistance * Math.cos(degToRad(angle));
-						y += remainingDistance * Math.sin(degToRad(angle));
-						return { x, y, angle };
+						x += remainingDistance * Math.cos(DegToRad(angle));
+						y += remainingDistance * Math.sin(DegToRad(angle));
+						return { x, y, angle, radius: 0 };
 					}
-					x += segment.length * Math.cos(degToRad(angle));
-					y += segment.length * Math.sin(degToRad(angle));
+					x += segment.length * Math.cos(DegToRad(angle));
+					y += segment.length * Math.sin(DegToRad(angle));
 					remainingDistance -= segment.length;
+					radius = 0;
 				} else if (segment.type === 'arc') {
-					const arcLength = Math.abs(segment.radius * degToRad(segment.angle));
+					const arcLength = Math.abs(segment.radius * DegToRad(segment.angle));
 					const anticlockwise = segment.angle < 0;
 					const thetaRad = remainingDistance / segment.radius;
-					const thetaDeg = radToDeg(thetaRad);
+					const thetaDeg = RadToDeg(thetaRad);
 
-					const cx = x - segment.radius * Math.sin(degToRad(angle)) * (anticlockwise ? -1 : 1);
-					const cy = y + segment.radius * Math.cos(degToRad(angle)) * (anticlockwise ? -1 : 1);
+					const cx = x - segment.radius * Math.sin(DegToRad(angle)) * (anticlockwise ? -1 : 1);
+					const cy = y + segment.radius * Math.cos(DegToRad(angle)) * (anticlockwise ? -1 : 1);
 
 					if (remainingDistance <= arcLength) {
 						angle += thetaDeg * Math.sign(segment.angle);
-						x = cx + segment.radius * Math.cos(degToRad(angle - 90 * (anticlockwise ? -1 : 1)));
-						y = cy + segment.radius * Math.sin(degToRad(angle - 90 * (anticlockwise ? -1 : 1)));
-						return { x, y, angle };
+						x = cx + segment.radius * Math.cos(DegToRad(angle - 90 * (anticlockwise ? -1 : 1)));
+						y = cy + segment.radius * Math.sin(DegToRad(angle - 90 * (anticlockwise ? -1 : 1)));
+						return { x, y, angle, radius: segment.radius };
 					}
 
 					angle += segment.angle;
-					x = cx + segment.radius * Math.cos(degToRad(angle - 90 * (anticlockwise ? -1 : 1)));
-					y = cy + segment.radius * Math.sin(degToRad(angle - 90 * (anticlockwise ? -1 : 1)));
+					x = cx + segment.radius * Math.cos(DegToRad(angle - 90 * (anticlockwise ? -1 : 1)));
+					y = cy + segment.radius * Math.sin(DegToRad(angle - 90 * (anticlockwise ? -1 : 1)));
 					remainingDistance -= arcLength;
+					radius = segment.radius;
 				}
 			}
 		}
-		return { x, y, angle };
+		return { x, y, angle, radius };
 	}
 
 	private calculateBoundingBox() {
@@ -133,8 +136,8 @@ export class Route {
 
 		for (const segment of this.path) {
 			if (segment.type === 'line') {
-				const endX = x + segment.length * Math.cos(degToRad(angle));
-				const endY = y + segment.length * Math.sin(degToRad(angle));
+				const endX = x + segment.length * Math.cos(DegToRad(angle));
+				const endY = y + segment.length * Math.sin(DegToRad(angle));
 
 				elements.push({ type: 'line', x: endX, y: endY });
 
@@ -142,11 +145,11 @@ export class Route {
 				y = endY;
 			} else if (segment.type === 'arc') {
 				const anticlockwise = segment.angle < 0;
-				const cx = x - segment.radius * Math.sin(degToRad(angle)) * (anticlockwise ? -1 : 1);
-				const cy = y + segment.radius * Math.cos(degToRad(angle)) * (anticlockwise ? -1 : 1);
+				const cx = x - segment.radius * Math.sin(DegToRad(angle)) * (anticlockwise ? -1 : 1);
+				const cy = y + segment.radius * Math.cos(DegToRad(angle)) * (anticlockwise ? -1 : 1);
 
-				const startAngleRad = degToRad(angle - 90 * (anticlockwise ? -1 : 1));
-				const endAngleRad = degToRad(angle - 90 * (anticlockwise ? -1 : 1) + segment.angle);
+				const startAngleRad = DegToRad(angle - 90 * (anticlockwise ? -1 : 1));
+				const endAngleRad = DegToRad(angle - 90 * (anticlockwise ? -1 : 1) + segment.angle);
 
 				elements.push({
 					type: 'arc',

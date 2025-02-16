@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { Shape } from 'svelte-konva';
 
-	import { degToRad } from '$lib/Math';
+	import { DegToRad } from '$lib/Math';
 	import type { Route } from '$lib/Route';
 
-	const ROADWIDTH_METER = 10;
+	const ROADWIDTH_METER = 7;
 	const ROADBORDER_PX = 2;
 
 	interface Properties {
@@ -56,7 +56,7 @@
 			for (let d = 0; d < route.pathLength; d++) {
 				const p = route.getPathPoint(d);
 				context.beginPath();
-				context.arc(p.x, p.y, 1, 0, degToRad(360), false);
+				context.arc(p.x, p.y, 1, 0, DegToRad(360), false);
 				context.fillStyle = '#f00';
 				context.fill();
 			}
