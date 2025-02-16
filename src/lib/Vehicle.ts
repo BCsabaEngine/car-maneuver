@@ -20,21 +20,29 @@ export class Vehicle {
 	) {}
 
 	public getStatus = (): VehicleStatus => ({
-		position: this.position,
-		speed: this.speed,
+		position: Math.trunc(this.position),
+		speed: Math.trunc(this.speed),
 		carType: this.carType,
 		carDescriptor: vehicleDescriptors[this.carType],
 		color: this.color,
 		isBreaking: this.acceleration < -vehicleDescriptors[this.carType].engine.breakAcceleration
 	});
 
+	public reset() {
+		this.position = 0;
+		this.speed = 0;
+		this.acceleration = 0;
+	}
+
 	private lastMove = Date.now();
-	public move(ahead: { distance: number; speed: number }) {
+	public move(ahead: { distance: number; speed: number }, curve: { radius?: number }) {
 		const elapsedSec = (Date.now() - this.lastMove) / 1000;
 		this.lastMove = Date.now();
 
 		this.position += this.speed * elapsedSec;
 		this.speed += this.acceleration * elapsedSec;
+
+		//let targetSpeed = this.driveParameters.maxSpeed;
 
 		if (ahead.distance < this.speed / 1.5) this.break();
 		else if (ahead.distance < this.speed) this.release();

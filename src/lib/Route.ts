@@ -1,4 +1,4 @@
-import type { RoutePath, RoutePoint } from '$types/RouteTypes';
+import type { RoutePath, RoutePoint, RouteStartPoint } from '$types/RouteTypes';
 
 import { DegToRad, RadToDeg } from './Math';
 
@@ -24,7 +24,7 @@ export class Route {
 	private elementsToDrawCache: RouteElementToDraw[];
 
 	constructor(
-		public startPoint: RoutePoint,
+		public startPoint: RouteStartPoint,
 		public path: RoutePath[]
 	) {
 		this.pathLengthCache = Math.trunc(this.calcTotalPathLength());
@@ -68,7 +68,8 @@ export class Route {
 		let remainingDistance = distance % this.calcTotalPathLength();
 		let x = this.startPoint.x,
 			y = this.startPoint.y,
-			angle = this.startPoint.angle;
+			angle = this.startPoint.angle,
+			radius = 0;
 
 		while (remainingDistance > 0) {
 			for (const segment of this.path) {
@@ -76,11 +77,12 @@ export class Route {
 					if (remainingDistance <= segment.length) {
 						x += remainingDistance * Math.cos(DegToRad(angle));
 						y += remainingDistance * Math.sin(DegToRad(angle));
-						return { x, y, angle };
+						return { x, y, angle, radius: 0 };
 					}
 					x += segment.length * Math.cos(DegToRad(angle));
 					y += segment.length * Math.sin(DegToRad(angle));
 					remainingDistance -= segment.length;
+					radius = 0;
 				} else if (segment.type === 'arc') {
 					const arcLength = Math.abs(segment.radius * DegToRad(segment.angle));
 					const anticlockwise = segment.angle < 0;
@@ -94,17 +96,18 @@ export class Route {
 						angle += thetaDeg * Math.sign(segment.angle);
 						x = cx + segment.radius * Math.cos(DegToRad(angle - 90 * (anticlockwise ? -1 : 1)));
 						y = cy + segment.radius * Math.sin(DegToRad(angle - 90 * (anticlockwise ? -1 : 1)));
-						return { x, y, angle };
+						return { x, y, angle, radius: segment.radius };
 					}
 
 					angle += segment.angle;
 					x = cx + segment.radius * Math.cos(DegToRad(angle - 90 * (anticlockwise ? -1 : 1)));
 					y = cy + segment.radius * Math.sin(DegToRad(angle - 90 * (anticlockwise ? -1 : 1)));
 					remainingDistance -= arcLength;
+					radius = segment.radius;
 				}
 			}
 		}
-		return { x, y, angle };
+		return { x, y, angle, radius };
 	}
 
 	private calculateBoundingBox() {

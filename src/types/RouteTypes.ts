@@ -1,8 +1,12 @@
-export interface RoutePoint {
+export type RouteStartPoint = {
 	x: number;
 	y: number;
 	angle: number;
-}
+};
+
+export type RoutePoint = RouteStartPoint & {
+	radius: number;
+};
 
 export type RoutePath =
 	| {
