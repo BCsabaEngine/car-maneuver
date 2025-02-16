@@ -1,6 +1,7 @@
 <script lang="ts">
 	import './app.postcss';
 
+	import { Button, Card } from 'flowbite-svelte';
 	import { SvelteMap } from 'svelte/reactivity';
 	import { Layer, Rect, Stage } from 'svelte-konva';
 
@@ -22,14 +23,23 @@
 
 	setInterval(() => {
 		for (const vehicle of traffic.vehicles) {
-			vehicle.move({ distance: 100, speed: 100 });
-			const status = vehicle.getStatus();
+			const currentStatus = vehicle.getStatus();
+			const currentPoint = traffic.route.getPathPoint(currentStatus.position);
+
+			vehicle.move({ distance: 100, speed: 100 }, { radius: currentPoint.radius });
+
+			const updatedStatus = vehicle.getStatus();
 			positions.set(vehicle, {
-				...status,
-				point: traffic.route.getPathPoint(status.position)
+				...updatedStatus,
+				point: traffic.route.getPathPoint(updatedStatus.position)
 			});
 		}
 	}, 10);
+
+	const resetVehicles = () => {
+		positions.clear();
+		for (const vehicle of traffic.vehicles) vehicle.reset();
+	};
 </script>
 
 <div class="flex justify-center my-4">
@@ -64,10 +74,27 @@
 		</Layer>
 	</Stage>
 </div>
+<div class="absolute top-0 left-0 p-4">
+	<Card class="w-48" shadow={false}>
+		{#each positions.values() as vehicle}
+			<span style={`color: ${vehicle.color}`}
+				>{vehicle.speed} <span class="text-xs">m/sec</span></span
+			>
+		{/each}
+	</Card>
+</div>
+<div class="absolute top-0 right-0 p-4">
+	<Button
+		class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+		on:click={resetVehicles}
+	>
+		Reset
+	</Button>
+</div>
 
 <style>
 	:global(body) {
-		background-color: #f3f4f6;
+		background-color: #f3f3f3;
 	}
 
 	:global(button) {
