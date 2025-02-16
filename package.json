@@ -1,0 +1,55 @@
+{
+	"name": "car-maneuver",
+	"version": "1.0.0",
+	"type": "module",
+	"main": "docs/index.js",
+	"engines": {
+		"node": ">=22.0.0",
+		"npm": ">=10.0.0"
+	},
+	"scripts": {
+		"dev": "vite dev --host",
+		"build": "vite build",
+		"preview": "vite preview",
+		"ts:check": "svelte-check --tsconfig ./tsconfig.json",
+		"format:check": "prettier --check .",
+		"format:fix": "prettier --write . | grep -v 'unchanged' | sed G",
+		"lint:check": "eslint .",
+		"lint:fix": "eslint --fix .",
+		"npm:reinstall": "rm -rf ./node_modules && rm -f ./package-lock.json && npm i && npm i",
+		"all": "node --run format:fix && node --run lint:fix && node --run ts:check && node --run build"
+	},
+	"devDependencies": {
+		"@sveltejs/vite-plugin-svelte": "^5.0.3",
+		"@tailwindcss/postcss": "^4.0.6",
+		"@tailwindcss/vite": "^4.0.6",
+		"@tsconfig/svelte": "^5.0.4",
+		"@types/three": "^0.173.0",
+		"@typescript-eslint/eslint-plugin": "^8.24.0",
+		"@typescript-eslint/parser": "^8.24.0",
+		"eslint": "^9.20.1",
+		"eslint-config-prettier": "^10.0.1",
+		"eslint-plugin-simple-import-sort": "^12.1.1",
+		"eslint-plugin-svelte": "^2.46.1",
+		"eslint-plugin-unicorn": "^56.0.1",
+		"postcss": "^8.5.2",
+		"prettier": "^3.5.1",
+		"prettier-plugin-svelte": "^3.3.3",
+		"svelte-check": "^4.1.4",
+		"svelte-eslint-parser": "^0.43.0",
+		"svelte-preprocess": "^6.0.3",
+		"tailwindcss": "^4.0.6",
+		"tslib": "^2.8.1",
+		"typescript": "^5.7.3",
+		"vite": "^6.1.0"
+	},
+	"dependencies": {
+		"@iconify/svelte": "^4.2.0",
+		"canvas": "^3.1.0",
+		"flowbite": "^3.1.2",
+		"flowbite-svelte": "^0.47.4",
+		"konva": "^9.3.18",
+		"svelte": "^5.20.1",
+		"svelte-konva": "^1.0.0-next.2"
+	}
+}

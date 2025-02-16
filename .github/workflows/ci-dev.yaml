@@ -1,0 +1,23 @@
+name: DEV pipeline
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+jobs:
+  check:
+    name: Source revision
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.13.1'
+          cache: 'npm'
+
+      - run: npm ci
+      - run: node --run format:check
+      - run: node --run lint:check
+      - run: node --run ts:check
