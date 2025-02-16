@@ -76,7 +76,7 @@
 		{pathLength} m in {box.width} x {box.height} m
 	</div>
 	<div class="flex justify-center my-4">
-		<ZoomRange class="w-3/5" bind:value={timeScale} title="Speed" min={10} max={100} step={10} />
+		<ZoomRange class="w-3/5" bind:value={timeScale} title="Speed" min={10} max={300} step={10} />
 	</div>
 </div>
 
@@ -107,7 +107,7 @@
 	</Stage>
 </div>
 
-<div class="absolute top-0 left-0 p-4">
+<div class="absolute top-10 left-0 p-4">
 	<Card class="w-48 " shadow={false}>
 		{#each positions.values() as vehicle}
 			<span style={`color: ${vehicle.color}`} class="flex flex-row gap-1 items-center">
@@ -121,11 +121,8 @@
 			</span>
 		{/each}
 	</Card>
-</div>
-
-<div class="absolute top-0 right-0 p-4">
 	<Button
-		class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+		class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
 		on:click={resetVehicles}
 	>
 		Reset
