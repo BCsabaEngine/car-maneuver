@@ -1,6 +1,7 @@
 <script lang="ts">
 	import './app.postcss';
 
+	import Icon from '@iconify/svelte';
 	import { Button, Card } from 'flowbite-svelte';
 	import { SvelteMap } from 'svelte/reactivity';
 	import { Layer, Rect, Stage } from 'svelte-konva';
@@ -75,11 +76,16 @@
 	</Stage>
 </div>
 <div class="absolute top-0 left-0 p-4">
-	<Card class="w-48" shadow={false}>
+	<Card class="w-48 " shadow={false}>
 		{#each positions.values() as vehicle}
-			<span style={`color: ${vehicle.color}`}
-				>{vehicle.speed} <span class="text-xs">m/sec</span></span
-			>
+			<span style={`color: ${vehicle.color}`} class="flex flex-row gap-1 items-center"
+				>{vehicle.speed} <span class="text-xs">m/sec</span>
+				{#if vehicle.isAccelerating}
+					<Icon icon="mdi:arrow-up" width="16" />
+				{:else if vehicle.isBreaking}
+					<Icon icon="mdi:arrow-down" width="16" />
+				{/if}
+			</span>
 		{/each}
 	</Card>
 </div>

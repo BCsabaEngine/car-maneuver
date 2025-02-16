@@ -6,6 +6,7 @@ import { vehicleDescriptors } from './vehicleDescriptors';
 type DriveParameters = {
 	maxSpeed: number;
 	maxAcceleration: number;
+	maxBreak: number;
 };
 
 export class Vehicle {
@@ -25,6 +26,7 @@ export class Vehicle {
 		carType: this.carType,
 		carDescriptor: vehicleDescriptors[this.carType],
 		color: this.color,
+		isAccelerating: this.acceleration > 0,
 		isBreaking: this.acceleration < -vehicleDescriptors[this.carType].engine.breakAcceleration
 	});
 
@@ -42,19 +44,29 @@ export class Vehicle {
 		this.position += this.speed * elapsedSec;
 		this.speed += this.acceleration * elapsedSec;
 
-		//let targetSpeed = this.driveParameters.maxSpeed;
+		let targetSpeed = this.driveParameters.maxSpeed;
+		if (ahead.distance < this.speed) targetSpeed = ahead.speed;
+		if (curve.radius) {
+			targetSpeed = Math.min(targetSpeed, curve.radius);
+			targetSpeed = Math.min(targetSpeed, this.speed);
+		}
 
-		if (ahead.distance < this.speed / 1.5) this.break();
-		else if (ahead.distance < this.speed) this.release();
-		else if (ahead.distance > this.speed * 1.5) this.accelerate();
+		if (this.speed === targetSpeed) this.hold();
+		else if (this.speed < targetSpeed) this.accelerate(this.speed < targetSpeed / 2 ? 1 : 0.75);
+		else {
+			if (this.speed > targetSpeed * 1.05) this.break();
+			else this.release();
+		}
 	}
 
 	private accelerate = (ratio = 1) =>
 		(this.acceleration = this.driveParameters.maxAcceleration * MathMinMax(ratio, 0, 1));
 
+	private hold = () => (this.acceleration = 0);
+
 	private release = () =>
 		(this.acceleration = -vehicleDescriptors[this.carType].engine.breakAcceleration);
 
 	private break = (ratio = 1) =>
-		(this.acceleration = -this.driveParameters.maxAcceleration * MathMinMax(ratio, 0, 1));
+		(this.acceleration = -this.driveParameters.maxBreak * MathMinMax(ratio, 0, 1));
 }

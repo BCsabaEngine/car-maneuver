@@ -18,6 +18,7 @@ export type VehicleStatus = {
 	carType: VehicleType;
 	carDescriptor: VehicleDescriptor;
 	color: string;
+	isAccelerating: boolean;
 	isBreaking: boolean;
 };
 
