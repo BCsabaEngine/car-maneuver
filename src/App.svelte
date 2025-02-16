@@ -1,18 +1,32 @@
 <script lang="ts">
 	import './app.postcss';
 
+	import { SvelteMap } from 'svelte/reactivity';
 	import { Layer, Rect, Stage } from 'svelte-konva';
 
-	import Road from '$components/Road.svelte';
+	import RoadShape from '$components/RoadShape.svelte';
+	import VehicleShape from '$components/VehicleShape.svelte';
 	import ZoomRange from '$components/ZoomRange.svelte';
+	import { Route } from '$lib/Route';
 	import { traffic } from '$lib/traffic';
+	import type { DrawingData, Vehicle as TVehicle } from '$lib/Vehicle';
+	import type { Point } from '$types/Path';
 
-	const PIXEL_PER_METER = 2;
+	const PIXEL_PER_METER = 1;
 
 	const box = traffic.route.box;
 	const pathLength = traffic.route.pathLength;
 
 	let zoom = $state(100);
+
+	const positions: Map<TVehicle, DrawingData> = new SvelteMap();
+
+	setInterval(() => {
+		for (const vehicle of traffic.vehicles) {
+			vehicle.move({ distance: 100, speed: 100 });
+			positions.set(vehicle, vehicle.getDrawingData());
+		}
+	}, 10);
 </script>
 
 <div class="flex justify-center my-4">
@@ -40,7 +54,15 @@
 				fill="#7a7"
 				stroke="#888"
 			/>
-			<Road route={traffic.route} pixelPerMeter={PIXEL_PER_METER} showPath />
+			<RoadShape route={traffic.route} pixelPerMeter={PIXEL_PER_METER} />
+			{#each positions.entries() as [vehicle, drawingData]}
+				<VehicleShape
+					offset={{ x: PIXEL_PER_METER * box.offsetX, y: PIXEL_PER_METER * box.offsetY }}
+					{drawingData}
+					point={traffic.route.getPathPoint(drawingData.position)}
+					pixelPerMeter={PIXEL_PER_METER}
+				/>
+			{/each}
 		</Layer>
 	</Stage>
 </div>

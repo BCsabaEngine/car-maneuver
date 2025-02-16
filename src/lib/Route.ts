@@ -1,6 +1,6 @@
 import type { Path, Point } from '$types/Path';
 
-import { degToRad, radToDeg } from './Math';
+import { DegToRad, RadToDeg } from './Math';
 
 const MARGIN_METER = 30;
 
@@ -60,7 +60,7 @@ export class Route {
 	private calcTotalPathLength = (): number =>
 		this.path.reduce(
 			(sum, seg) =>
-				sum + (seg.type === 'line' ? seg.length : Math.abs(seg.radius * degToRad(seg.angle))),
+				sum + (seg.type === 'line' ? seg.length : Math.abs(seg.radius * DegToRad(seg.angle))),
 			0
 		);
 
@@ -74,32 +74,32 @@ export class Route {
 			for (const segment of this.path) {
 				if (segment.type === 'line') {
 					if (remainingDistance <= segment.length) {
-						x += remainingDistance * Math.cos(degToRad(angle));
-						y += remainingDistance * Math.sin(degToRad(angle));
+						x += remainingDistance * Math.cos(DegToRad(angle));
+						y += remainingDistance * Math.sin(DegToRad(angle));
 						return { x, y, angle };
 					}
-					x += segment.length * Math.cos(degToRad(angle));
-					y += segment.length * Math.sin(degToRad(angle));
+					x += segment.length * Math.cos(DegToRad(angle));
+					y += segment.length * Math.sin(DegToRad(angle));
 					remainingDistance -= segment.length;
 				} else if (segment.type === 'arc') {
-					const arcLength = Math.abs(segment.radius * degToRad(segment.angle));
+					const arcLength = Math.abs(segment.radius * DegToRad(segment.angle));
 					const anticlockwise = segment.angle < 0;
 					const thetaRad = remainingDistance / segment.radius;
-					const thetaDeg = radToDeg(thetaRad);
+					const thetaDeg = RadToDeg(thetaRad);
 
-					const cx = x - segment.radius * Math.sin(degToRad(angle)) * (anticlockwise ? -1 : 1);
-					const cy = y + segment.radius * Math.cos(degToRad(angle)) * (anticlockwise ? -1 : 1);
+					const cx = x - segment.radius * Math.sin(DegToRad(angle)) * (anticlockwise ? -1 : 1);
+					const cy = y + segment.radius * Math.cos(DegToRad(angle)) * (anticlockwise ? -1 : 1);
 
 					if (remainingDistance <= arcLength) {
 						angle += thetaDeg * Math.sign(segment.angle);
-						x = cx + segment.radius * Math.cos(degToRad(angle - 90 * (anticlockwise ? -1 : 1)));
-						y = cy + segment.radius * Math.sin(degToRad(angle - 90 * (anticlockwise ? -1 : 1)));
+						x = cx + segment.radius * Math.cos(DegToRad(angle - 90 * (anticlockwise ? -1 : 1)));
+						y = cy + segment.radius * Math.sin(DegToRad(angle - 90 * (anticlockwise ? -1 : 1)));
 						return { x, y, angle };
 					}
 
 					angle += segment.angle;
-					x = cx + segment.radius * Math.cos(degToRad(angle - 90 * (anticlockwise ? -1 : 1)));
-					y = cy + segment.radius * Math.sin(degToRad(angle - 90 * (anticlockwise ? -1 : 1)));
+					x = cx + segment.radius * Math.cos(DegToRad(angle - 90 * (anticlockwise ? -1 : 1)));
+					y = cy + segment.radius * Math.sin(DegToRad(angle - 90 * (anticlockwise ? -1 : 1)));
 					remainingDistance -= arcLength;
 				}
 			}
@@ -133,8 +133,8 @@ export class Route {
 
 		for (const segment of this.path) {
 			if (segment.type === 'line') {
-				const endX = x + segment.length * Math.cos(degToRad(angle));
-				const endY = y + segment.length * Math.sin(degToRad(angle));
+				const endX = x + segment.length * Math.cos(DegToRad(angle));
+				const endY = y + segment.length * Math.sin(DegToRad(angle));
 
 				elements.push({ type: 'line', x: endX, y: endY });
 
@@ -142,11 +142,11 @@ export class Route {
 				y = endY;
 			} else if (segment.type === 'arc') {
 				const anticlockwise = segment.angle < 0;
-				const cx = x - segment.radius * Math.sin(degToRad(angle)) * (anticlockwise ? -1 : 1);
-				const cy = y + segment.radius * Math.cos(degToRad(angle)) * (anticlockwise ? -1 : 1);
+				const cx = x - segment.radius * Math.sin(DegToRad(angle)) * (anticlockwise ? -1 : 1);
+				const cy = y + segment.radius * Math.cos(DegToRad(angle)) * (anticlockwise ? -1 : 1);
 
-				const startAngleRad = degToRad(angle - 90 * (anticlockwise ? -1 : 1));
-				const endAngleRad = degToRad(angle - 90 * (anticlockwise ? -1 : 1) + segment.angle);
+				const startAngleRad = DegToRad(angle - 90 * (anticlockwise ? -1 : 1));
+				const endAngleRad = DegToRad(angle - 90 * (anticlockwise ? -1 : 1) + segment.angle);
 
 				elements.push({
 					type: 'arc',
