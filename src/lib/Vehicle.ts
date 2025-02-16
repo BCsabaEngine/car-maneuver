@@ -1,22 +1,10 @@
-import { MathMinMax } from './Math';
+import type { CarDescriptor, CarType, VehicleStatus } from '$types/VehicleTypes';
 
-type CarType = 'car' | 'truck';
+import { MathMinMax } from './Math';
 
 type DriveParameters = {
 	maxSpeed: number;
 	maxAcceleration: number;
-};
-
-type CarDescriptor = {
-	engineBreakAcceleration: number;
-};
-
-export type DrawingData = {
-	position: number;
-	speed: number;
-	carType: CarType;
-	color: string;
-	isBreaking: boolean;
 };
 
 const carDescriptors: Record<CarType, CarDescriptor> = {
@@ -39,10 +27,11 @@ export class Vehicle {
 		private driveParameters: DriveParameters
 	) {}
 
-	public getDrawingData = (): DrawingData => ({
+	public getStatus = (): VehicleStatus => ({
 		position: this.position,
 		speed: this.speed,
 		carType: this.carType,
+		carDescriptor: carDescriptors[this.carType],
 		color: this.color,
 		isBreaking: this.acceleration < -carDescriptors[this.carType].engineBreakAcceleration
 	});

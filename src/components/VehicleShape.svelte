@@ -1,25 +1,22 @@
 <script lang="ts">
 	import { Shape } from 'svelte-konva';
 
-	import type { DrawingData, Vehicle } from '$lib/Vehicle';
-	import type { Point } from '$types/Path';
+	import type { DrawingData } from '$types/VehicleTypes';
 
 	interface Properties {
-		offset: { x: number; y: number };
 		drawingData: DrawingData;
-		point: Point;
 		pixelPerMeter: number;
 	}
 
-	const { offset, drawingData, point, pixelPerMeter }: Properties = $props();
+	const { drawingData, pixelPerMeter }: Properties = $props();
 </script>
 
 <Shape
 	scaleX={pixelPerMeter}
 	scaleY={pixelPerMeter}
-	x={point.x}
-	y={point.y}
-	rotation={point.angle}
+	x={drawingData.point.x * pixelPerMeter}
+	y={drawingData.point.y * pixelPerMeter}
+	rotation={drawingData.point.angle}
 	sceneFunc={(context) => {
 		context.beginPath();
 		context.moveTo(-7, 0);

@@ -1,4 +1,4 @@
-import type { Path, Point } from '$types/Path';
+import type { RoutePath, RoutePoint } from '$types/RouteTypes';
 
 import { DegToRad, RadToDeg } from './Math';
 
@@ -20,12 +20,12 @@ type RouteElementToDraw =
 export class Route {
 	private boundingBoxCache: { minX: number; minY: number; maxX: number; maxY: number };
 	private pathLengthCache: number;
-	private pathPointsCache: Point[] = [];
+	private pathPointsCache: RoutePoint[] = [];
 	private elementsToDrawCache: RouteElementToDraw[];
 
 	constructor(
-		public startPoint: Point,
-		public path: Path
+		public startPoint: RoutePoint,
+		public path: RoutePath[]
 	) {
 		this.pathLengthCache = Math.trunc(this.calcTotalPathLength());
 		for (let d = 0; d < this.pathLengthCache; d++)
@@ -39,7 +39,7 @@ export class Route {
 		return this.pathLengthCache;
 	}
 
-	public getPathPoint(distance: number): Point {
+	public getPathPoint(distance: number): RoutePoint {
 		return this.pathPointsCache[Math.trunc(distance % this.pathLengthCache)];
 	}
 
@@ -64,7 +64,7 @@ export class Route {
 			0
 		);
 
-	private calcPositionOnPath(distance: number): Point {
+	private calcPositionOnPath(distance: number): RoutePoint {
 		let remainingDistance = distance % this.calcTotalPathLength();
 		let x = this.startPoint.x,
 			y = this.startPoint.y,
