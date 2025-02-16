@@ -49,18 +49,18 @@
 	};
 </script>
 
-<div class="grid grid-cols-2">
+<div class="grid grid-cols-3">
 	<div class="flex justify-center my-4">
 		<ZoomRange class="w-3/5" bind:value={zoom} min={10} max={300} step={10} />
+	</div>
+	<div class="flex justify-center my-4">
+		{pathLength} m in {box.width} x {box.height} m
 	</div>
 	<div class="flex justify-center my-4">
 		<ZoomRange class="w-3/5" bind:value={timeScale} title="Speed" min={10} max={100} step={10} />
 	</div>
 </div>
 
-<div class="flex justify-center my-4">
-	{pathLength} m in {box.width} x {box.height} m
-</div>
 <div class="flex justify-center">
 	<Stage
 		width={PIXEL_PER_METER * box.width * (zoom / 100)}
