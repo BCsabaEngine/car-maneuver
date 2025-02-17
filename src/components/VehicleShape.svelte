@@ -1,21 +1,30 @@
 <script lang="ts">
 	import { Shape } from 'svelte-konva';
 
+	import { DegToRad } from '$lib/Math';
 	import type { DrawingData } from '$types/VehicleTypes';
+
+	import { ROAD_LANE_WIDTH_METER, WORLD_PIXEL_PER_METER } from '../config/world';
 
 	interface Properties {
 		drawingData: DrawingData;
-		pixelPerMeter: number;
+		lane: 'cw' | 'ccw';
 	}
 
-	const { drawingData, pixelPerMeter }: Properties = $props();
+	const { drawingData, lane }: Properties = $props();
 </script>
 
 <Shape
-	scaleX={pixelPerMeter}
-	scaleY={pixelPerMeter}
-	x={drawingData.point.x * pixelPerMeter}
-	y={drawingData.point.y * pixelPerMeter}
+	scaleX={WORLD_PIXEL_PER_METER}
+	scaleY={WORLD_PIXEL_PER_METER}
+	x={(drawingData.point.x +
+		(ROAD_LANE_WIDTH_METER / 2) *
+			Math.cos(DegToRad(drawingData.point.angle + (lane === 'cw' ? 90 : -90)))) *
+		WORLD_PIXEL_PER_METER}
+	y={(drawingData.point.y +
+		(ROAD_LANE_WIDTH_METER / 2) *
+			Math.sin(DegToRad(drawingData.point.angle + (lane === 'cw' ? 90 : -90)))) *
+		WORLD_PIXEL_PER_METER}
 	rotation={drawingData.point.angle}
 	sceneFunc={(context) => {
 		context.beginPath();

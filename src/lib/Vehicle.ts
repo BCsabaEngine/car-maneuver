@@ -1,7 +1,7 @@
 import type { VehicleStatus, VehicleType } from '$types/VehicleTypes';
 
+import { vehicleDescriptors } from '../config/vehicleDescriptors';
 import { MathMinMax } from './Math';
-import { vehicleDescriptors } from './vehicleDescriptors';
 
 type DriveParameters = {
 	maxSpeed: number;

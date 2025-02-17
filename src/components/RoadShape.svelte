@@ -8,20 +8,21 @@
 		ROAD_DIVIDING_LINE_LENGTH_PX,
 		ROAD_DIVIDING_LINE_WIDTH_PX,
 		ROAD_LANE_WIDTH_METER,
-		ROAD_MARGIN_WIDTH_PX	} from '../config';
+		ROAD_MARGIN_WIDTH_PX,
+		WORLD_PIXEL_PER_METER
+	} from '../config/world';
 
 	interface Properties {
 		route: Route;
-		pixelPerMeter: number;
 		showPath?: boolean;
 	}
 
-	const { route, pixelPerMeter, showPath = false }: Properties = $props();
+	const { route, showPath = false }: Properties = $props();
 </script>
 
 <Shape
-	scaleX={pixelPerMeter}
-	scaleY={pixelPerMeter}
+	scaleX={WORLD_PIXEL_PER_METER}
+	scaleY={WORLD_PIXEL_PER_METER}
 	width={route.box.width}
 	height={route.box.height}
 	sceneFunc={(context) => {

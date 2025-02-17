@@ -9,11 +9,11 @@
 	import RoadShape from '$components/RoadShape.svelte';
 	import VehicleShape from '$components/VehicleShape.svelte';
 	import ZoomRange from '$components/ZoomRange.svelte';
-	import { traffic } from '$lib/traffic';
 	import type { Vehicle } from '$lib/Vehicle';
 	import type { DrawingData } from '$types/VehicleTypes';
 
-	import { WORLD_PIXEL_PER_METER } from './config';
+	import { traffic } from './config/traffic';
+	import { WORLD_PIXEL_PER_METER } from './config/world';
 
 	const box = traffic.route.box;
 	const pathLength = traffic.route.pathLength;
@@ -99,9 +99,9 @@
 				fill="#7a7"
 				stroke="#888"
 			/>
-			<RoadShape route={traffic.route} pixelPerMeter={WORLD_PIXEL_PER_METER} />
+			<RoadShape route={traffic.route} />
 			{#each positions.values() as drawingData}
-				<VehicleShape {drawingData} pixelPerMeter={WORLD_PIXEL_PER_METER} />
+				<VehicleShape {drawingData} lane="cw" />
 			{/each}
 		</Layer>
 	</Stage>
