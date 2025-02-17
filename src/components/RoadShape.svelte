@@ -4,8 +4,10 @@
 	import { DegToRad } from '$lib/Math';
 	import type { Route } from '$lib/Route';
 
-	const ROADWIDTH_METER = 7;
-	const ROADBORDER_PX = 2;
+	const LANEWIDTH_METER = 7;
+	const BORDERWIDTH_PX = 2;
+	const LINEWIDTH_PX = 1;
+	const LINELENGTH_PX = 4;
 
 	interface Properties {
 		route: Route;
@@ -23,16 +25,16 @@
 	height={route.box.height}
 	sceneFunc={(context) => {
 		const elementsToDraw = route.elementToDraw;
-		for (const part of ['border', 'road']) {
+		for (const part of ['border', 'road', 'line']) {
 			context.beginPath();
 			for (const element of elementsToDraw) {
 				switch (element.type) {
-					case 'line': {
-						context.lineTo(element.x, element.y);
-						break;
-					}
 					case 'move': {
 						context.moveTo(element.x, element.y);
+						break;
+					}
+					case 'line': {
+						context.lineTo(element.x, element.y);
 						break;
 					}
 					case 'arc': {
@@ -48,10 +50,34 @@
 					}
 				}
 			}
-			context.lineWidth = part === 'border' ? ROADWIDTH_METER + ROADBORDER_PX * 2 : ROADWIDTH_METER;
-			context.strokeStyle = part === 'border' ? '#ccc' : '#888';
+			context.lineWidth =
+				part === 'border'
+					? LANEWIDTH_METER * 2 + BORDERWIDTH_PX * 2
+					: part === 'road'
+						? LANEWIDTH_METER * 2
+						: LINEWIDTH_PX;
+			context.strokeStyle = part === 'border' ? '#ccc' : part === 'road' ? '#888' : '#fff';
 			context.stroke();
 		}
+
+		context.beginPath();
+		for (const element of elementsToDraw) {
+			switch (element.type) {
+				case 'move': {
+					context.moveTo(element.x, element.y);
+					break;
+				}
+				case 'line': {
+					context.lineTo(element.x, element.y);
+					break;
+				}
+			}
+		}
+		context.setLineDash([LINELENGTH_PX]);
+		context.lineWidth = LINEWIDTH_PX;
+		context.strokeStyle = '#888';
+		context.stroke();
+
 		if (showPath)
 			for (let d = 0; d < route.pathLength; d++) {
 				const p = route.getPathPoint(d);

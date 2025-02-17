@@ -176,6 +176,7 @@ export class Route {
 				x = cx + segment.radius * Math.cos(endAngleRad);
 				y = cy + segment.radius * Math.sin(endAngleRad);
 				angle += segment.angle;
+				elements.push({ type: 'move', x, y });
 			}
 		}
 		return elements;
