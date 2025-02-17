@@ -4,10 +4,11 @@
 	import { DegToRad } from '$lib/Math';
 	import type { Route } from '$lib/Route';
 
-	const LANEWIDTH_METER = 7;
-	const BORDERWIDTH_PX = 2;
-	const LINEWIDTH_PX = 1;
-	const LINELENGTH_PX = 4;
+	import {
+		ROAD_DIVIDING_LINE_LENGTH_PX,
+		ROAD_DIVIDING_LINE_WIDTH_PX,
+		ROAD_LANE_WIDTH_METER,
+		ROAD_MARGIN_WIDTH_PX	} from '../config';
 
 	interface Properties {
 		route: Route;
@@ -52,10 +53,10 @@
 			}
 			context.lineWidth =
 				part === 'border'
-					? LANEWIDTH_METER * 2 + BORDERWIDTH_PX * 2
+					? ROAD_LANE_WIDTH_METER * 2 + ROAD_MARGIN_WIDTH_PX * 2
 					: part === 'road'
-						? LANEWIDTH_METER * 2
-						: LINEWIDTH_PX;
+						? ROAD_LANE_WIDTH_METER * 2
+						: ROAD_DIVIDING_LINE_WIDTH_PX;
 			context.strokeStyle = part === 'border' ? '#ccc' : part === 'road' ? '#888' : '#fff';
 			context.stroke();
 		}
@@ -73,8 +74,8 @@
 				}
 			}
 		}
-		context.setLineDash([LINELENGTH_PX]);
-		context.lineWidth = LINEWIDTH_PX;
+		context.setLineDash([ROAD_DIVIDING_LINE_LENGTH_PX]);
+		context.lineWidth = ROAD_DIVIDING_LINE_WIDTH_PX;
 		context.strokeStyle = '#888';
 		context.stroke();
 

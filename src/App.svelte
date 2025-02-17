@@ -13,7 +13,7 @@
 	import type { Vehicle } from '$lib/Vehicle';
 	import type { DrawingData } from '$types/VehicleTypes';
 
-	const PIXEL_PER_METER = 2;
+	import { WORLD_PIXEL_PER_METER } from './config';
 
 	const box = traffic.route.box;
 	const pathLength = traffic.route.pathLength;
@@ -82,26 +82,26 @@
 
 <div class="flex justify-center">
 	<Stage
-		width={PIXEL_PER_METER * box.width * (zoom / 100)}
-		height={PIXEL_PER_METER * box.height * (zoom / 100)}
+		width={WORLD_PIXEL_PER_METER * box.width * (zoom / 100)}
+		height={WORLD_PIXEL_PER_METER * box.height * (zoom / 100)}
 		scaleX={zoom / 100}
 		scaleY={zoom / 100}
-		offsetX={PIXEL_PER_METER * box.offsetX}
-		offsetY={PIXEL_PER_METER * box.offsetY}
+		offsetX={WORLD_PIXEL_PER_METER * box.offsetX}
+		offsetY={WORLD_PIXEL_PER_METER * box.offsetY}
 	>
 		<Layer>
 			<Rect
 				id="background"
-				x={PIXEL_PER_METER * box.offsetX}
-				y={PIXEL_PER_METER * box.offsetY}
-				width={PIXEL_PER_METER * box.width}
-				height={PIXEL_PER_METER * box.height}
+				x={WORLD_PIXEL_PER_METER * box.offsetX}
+				y={WORLD_PIXEL_PER_METER * box.offsetY}
+				width={WORLD_PIXEL_PER_METER * box.width}
+				height={WORLD_PIXEL_PER_METER * box.height}
 				fill="#7a7"
 				stroke="#888"
 			/>
-			<RoadShape route={traffic.route} pixelPerMeter={PIXEL_PER_METER} />
+			<RoadShape route={traffic.route} pixelPerMeter={WORLD_PIXEL_PER_METER} />
 			{#each positions.values() as drawingData}
-				<VehicleShape {drawingData} pixelPerMeter={PIXEL_PER_METER} />
+				<VehicleShape {drawingData} pixelPerMeter={WORLD_PIXEL_PER_METER} />
 			{/each}
 		</Layer>
 	</Stage>
