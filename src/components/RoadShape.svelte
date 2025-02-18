@@ -55,10 +55,10 @@
 			context.lineWidth =
 				part === 'border'
 					? ROAD_LANE_WIDTH_METER * 2 + ROAD_MARGIN_WIDTH_PX * 2
-					: part === 'road'
+					: (part === 'road'
 						? ROAD_LANE_WIDTH_METER * 2
-						: ROAD_DIVIDING_LINE_WIDTH_PX;
-			context.strokeStyle = part === 'border' ? '#ccc' : part === 'road' ? '#888' : '#fff';
+						: ROAD_DIVIDING_LINE_WIDTH_PX);
+			context.strokeStyle = part === 'border' ? '#ccc' : (part === 'road' ? '#888' : '#fff');
 			context.stroke();
 		}
 

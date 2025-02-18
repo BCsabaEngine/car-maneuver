@@ -29,9 +29,9 @@
 			const aheadVehicle =
 				traffic.vehicles.length < 2
 					? undefined
-					: v > 0
+					: (v > 0
 						? traffic.vehicles[v - 1]
-						: traffic.vehicles.at(-1);
+						: traffic.vehicles.at(-1));
 
 			const currentStatus = vehicle.getStatus();
 			const currentPoint = traffic.route.getPathPoint(currentStatus.position);
