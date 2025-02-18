@@ -38,15 +38,16 @@
 					aheadVehicle
 						? {
 								distance:
-									(aheadVehicle.getStatus().position +
-										aheadVehicle.getStatus().carDescriptor.shape.length -
-										currentStatus.position -
-										currentStatus.carDescriptor.shape.length +
-										pathLength) %
-									pathLength,
+									(lane === 'cw'
+										? (aheadVehicle.getStatus().position - currentStatus.position + pathLength) %
+											pathLength
+										: (currentStatus.position - aheadVehicle.getStatus().position + pathLength) %
+											pathLength) +
+									aheadVehicle.getStatus().carDescriptor.shape.length +
+									currentStatus.carDescriptor.shape.length,
 								speed: aheadVehicle.getStatus().speed
 							}
-						: { distance: 1000, speed: 1000 },
+						: undefined,
 					{ radius: currentPoint.radius },
 					currentPoint.nextCurveCw,
 					currentPoint.nextCurveCcw,

@@ -45,7 +45,7 @@ export class Vehicle {
 
 	private lastMove = Date.now();
 	public move(
-		ahead: { distance: number; speed: number },
+		ahead: { distance: number; speed: number } | undefined,
 		currentCurve: { radius?: number },
 		nextCurveCw: { distance: number; radius: number } | undefined,
 		nextCurveCcw: { distance: number; radius: number } | undefined,
@@ -58,15 +58,27 @@ export class Vehicle {
 		this.speed += this.acceleration * elapsedSec;
 
 		const targetSpeeds = [this.driveParameters.maxSpeed];
-		if (
-			ahead.distance <
-			Math.max(
-				this.speed ** 2 / (2 * this.driveParameters.maxBreak),
-				vehicleDescriptors[this.carType].shape.length * 2
+
+		if (ahead)
+			if (
+				Math.abs(ahead.distance) <
+				Math.min(
+					this.speed ** 2 / (2 * this.driveParameters.maxBreak),
+					vehicleDescriptors[this.carType].shape.length
+				)
 			)
-		)
-			targetSpeeds.push(ahead.speed * 0.95);
+				targetSpeeds.push(0);
+			else if (
+				Math.abs(ahead.distance) <
+				Math.min(
+					this.speed ** 2 / (2 * this.driveParameters.maxBreak),
+					vehicleDescriptors[this.carType].shape.length * 2
+				)
+			)
+				targetSpeeds.push(0); //ahead.speed * 0.8
+
 		if (currentCurve.radius) targetSpeeds.push(currentCurve.radius);
+
 		const nextCurve = this.lane === 'cw' ? nextCurveCw : nextCurveCcw;
 		if (
 			nextCurve &&
