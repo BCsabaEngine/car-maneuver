@@ -48,7 +48,8 @@
 							}
 						: { distance: 1000, speed: 1000 },
 					{ radius: currentPoint.radius },
-					currentPoint.nextCurve,
+					currentPoint.nextCurveCw,
+					currentPoint.nextCurveCcw,
 					timeScale
 				);
 

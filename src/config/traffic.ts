@@ -28,7 +28,7 @@ export const traffic = {
 	vehicles: [
 		new Vehicle('cw', 'car', 'green', { maxSpeed: 100, maxAcceleration: 15, maxBreak: 25 }, 20),
 		new Vehicle('cw', 'car', 'blue', { maxSpeed: 60, maxAcceleration: 20, maxBreak: 20 }, 10),
-		new Vehicle('cw', 'truck', 'yellow', { maxSpeed: 80, maxAcceleration: 15, maxBreak: 20 }, 5),
+		new Vehicle('cw', 'truck', 'orange', { maxSpeed: 80, maxAcceleration: 15, maxBreak: 20 }, 5),
 
 		new Vehicle('ccw', 'truck', 'purple', { maxSpeed: 110, maxAcceleration: 20, maxBreak: 20 }, 0)
 	]
