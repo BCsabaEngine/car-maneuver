@@ -6,8 +6,8 @@ export const vehicleDescriptors: Record<VehicleType, VehicleDescriptor> = {
 			breakAcceleration: 1
 		},
 		shape: {
-			width: 2.5,
-			length: 5
+			width: 4,
+			length: 6
 		}
 	},
 	truck: {
@@ -15,8 +15,17 @@ export const vehicleDescriptors: Record<VehicleType, VehicleDescriptor> = {
 			breakAcceleration: 1
 		},
 		shape: {
-			width: 3.5,
+			width: 5,
 			length: 9
+		}
+	},
+	bus: {
+		engine: {
+			breakAcceleration: 1
+		},
+		shape: {
+			width: 5,
+			length: 15
 		}
 	}
 };

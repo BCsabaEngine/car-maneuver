@@ -4,35 +4,39 @@
 	import { DegToRad } from '$lib/Math';
 	import type { Route } from '$lib/Route';
 
-	const ROADWIDTH_METER = 7;
-	const ROADBORDER_PX = 2;
+	import {
+		ROAD_DIVIDING_LINE_LENGTH_PX,
+		ROAD_DIVIDING_LINE_WIDTH_PX,
+		ROAD_LANE_WIDTH_METER,
+		ROAD_MARGIN_WIDTH_PX,
+		WORLD_PIXEL_PER_METER
+	} from '../config/world';
 
 	interface Properties {
 		route: Route;
-		pixelPerMeter: number;
 		showPath?: boolean;
 	}
 
-	const { route, pixelPerMeter, showPath = false }: Properties = $props();
+	const { route, showPath = false }: Properties = $props();
 </script>
 
 <Shape
-	scaleX={pixelPerMeter}
-	scaleY={pixelPerMeter}
+	scaleX={WORLD_PIXEL_PER_METER}
+	scaleY={WORLD_PIXEL_PER_METER}
 	width={route.box.width}
 	height={route.box.height}
 	sceneFunc={(context) => {
 		const elementsToDraw = route.elementToDraw;
-		for (const part of ['border', 'road']) {
+		for (const part of ['border', 'road', 'line']) {
 			context.beginPath();
 			for (const element of elementsToDraw) {
 				switch (element.type) {
-					case 'line': {
-						context.lineTo(element.x, element.y);
-						break;
-					}
 					case 'move': {
 						context.moveTo(element.x, element.y);
+						break;
+					}
+					case 'line': {
+						context.lineTo(element.x, element.y);
 						break;
 					}
 					case 'arc': {
@@ -48,10 +52,34 @@
 					}
 				}
 			}
-			context.lineWidth = part === 'border' ? ROADWIDTH_METER + ROADBORDER_PX * 2 : ROADWIDTH_METER;
-			context.strokeStyle = part === 'border' ? '#ccc' : '#888';
+			context.lineWidth =
+				part === 'border'
+					? ROAD_LANE_WIDTH_METER * 2 + ROAD_MARGIN_WIDTH_PX * 2
+					: (part === 'road'
+						? ROAD_LANE_WIDTH_METER * 2
+						: ROAD_DIVIDING_LINE_WIDTH_PX);
+			context.strokeStyle = part === 'border' ? '#ccc' : (part === 'road' ? '#888' : '#fff');
 			context.stroke();
 		}
+
+		context.beginPath();
+		for (const element of elementsToDraw) {
+			switch (element.type) {
+				case 'move': {
+					context.moveTo(element.x, element.y);
+					break;
+				}
+				case 'line': {
+					context.lineTo(element.x, element.y);
+					break;
+				}
+			}
+		}
+		context.setLineDash([ROAD_DIVIDING_LINE_LENGTH_PX]);
+		context.lineWidth = ROAD_DIVIDING_LINE_WIDTH_PX;
+		context.strokeStyle = '#888';
+		context.stroke();
+
 		if (showPath)
 			for (let d = 0; d < route.pathLength; d++) {
 				const p = route.getPathPoint(d);

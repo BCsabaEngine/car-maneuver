@@ -1,7 +1,7 @@
 import type { VehicleStatus, VehicleType } from '$types/VehicleTypes';
 
+import { vehicleDescriptors } from '../config/vehicleDescriptors';
 import { MathMinMax } from './Math';
-import { vehicleDescriptors } from './vehicleDescriptors';
 
 type DriveParameters = {
 	maxSpeed: number;
@@ -16,6 +16,7 @@ export class Vehicle {
 	private acceleration = 0;
 
 	constructor(
+		public lane: 'cw' | 'ccw',
 		private carType: VehicleType,
 		private color: string,
 		private driveParameters: DriveParameters,
@@ -25,6 +26,7 @@ export class Vehicle {
 	}
 
 	public getStatus = (): VehicleStatus => ({
+		lane: this.lane,
 		position: Math.trunc(this.position),
 		speed: Math.trunc(this.speed),
 		targetSpeed: Math.trunc(this.targetSpeed),
@@ -43,29 +45,33 @@ export class Vehicle {
 
 	private lastMove = Date.now();
 	public move(
-		ahead: { distance: number; speed: number },
+		ahead: { distance: number; speed: number } | undefined,
 		currentCurve: { radius?: number },
-		nextCurve: { distance: number; radius: number } | undefined,
+		nextCurveCw: { distance: number; radius: number } | undefined,
+		nextCurveCcw: { distance: number; radius: number } | undefined,
 		timeScalePercent: number
 	) {
 		const elapsedSec = ((Date.now() - this.lastMove) / 1000) * (timeScalePercent / 100);
 		this.lastMove = Date.now();
 
-		this.position += this.speed * elapsedSec;
+		this.position += this.speed * elapsedSec * (this.lane === 'cw' ? 1 : -1);
 		this.speed += this.acceleration * elapsedSec;
 
 		const targetSpeeds = [this.driveParameters.maxSpeed];
+
 		if (
-			ahead.speed < this.speed &&
-			ahead.distance <
+			ahead &&
+			Math.abs(ahead.distance) <
 				Math.max(
 					this.speed ** 2 / (2 * this.driveParameters.maxBreak),
-					vehicleDescriptors[this.carType].shape.length
-				) *
-					2
+					vehicleDescriptors[this.carType].shape.length * 3
+				)
 		)
-			targetSpeeds.push(ahead.speed);
+			targetSpeeds.push(0);
+
 		if (currentCurve.radius) targetSpeeds.push(currentCurve.radius);
+
+		const nextCurve = this.lane === 'cw' ? nextCurveCw : nextCurveCcw;
 		if (
 			nextCurve &&
 			nextCurve.distance <
@@ -73,7 +79,7 @@ export class Vehicle {
 		)
 			targetSpeeds.push(nextCurve.radius);
 
-		this.targetSpeed = Math.min(...targetSpeeds);
+		this.targetSpeed = Math.max(0, Math.round(Math.min(...targetSpeeds)));
 
 		if (this.speed === this.targetSpeed) this.hold();
 		else if (this.speed < this.targetSpeed)

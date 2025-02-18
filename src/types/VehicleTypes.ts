@@ -1,6 +1,6 @@
 import type { RoutePoint } from './RouteTypes';
 
-export type VehicleType = 'car' | 'truck';
+export type VehicleType = 'car' | 'truck' | 'bus';
 
 export type VehicleDescriptor = {
 	engine: {
@@ -13,6 +13,7 @@ export type VehicleDescriptor = {
 };
 
 export type VehicleStatus = {
+	lane: 'cw' | 'ccw';
 	position: number;
 	speed: number;
 	targetSpeed: number;

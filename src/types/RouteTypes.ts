@@ -6,7 +6,13 @@ export type RouteStartPoint = {
 
 export type RoutePoint = RouteStartPoint & {
 	radius: number;
-	nextCurve:
+	nextCurveCw:
+		| {
+				distance: number;
+				radius: number;
+		  }
+		| undefined;
+	nextCurveCcw:
 		| {
 				distance: number;
 				radius: number;

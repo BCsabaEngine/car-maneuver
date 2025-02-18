@@ -9,11 +9,11 @@
 	import RoadShape from '$components/RoadShape.svelte';
 	import VehicleShape from '$components/VehicleShape.svelte';
 	import ZoomRange from '$components/ZoomRange.svelte';
-	import { traffic } from '$lib/traffic';
 	import type { Vehicle } from '$lib/Vehicle';
 	import type { DrawingData } from '$types/VehicleTypes';
 
-	const PIXEL_PER_METER = 2;
+	import { traffic } from './config/traffic';
+	import { WORLD_PIXEL_PER_METER } from './config/world';
 
 	const box = traffic.route.box;
 	const pathLength = traffic.route.pathLength;
@@ -24,41 +24,42 @@
 	const positions: Map<Vehicle, DrawingData> = new SvelteMap();
 
 	setInterval(() => {
-		for (let v = 0; v < traffic.vehicles.length; v++) {
-			const vehicle = traffic.vehicles[v];
-			const aheadVehicle =
-				traffic.vehicles.length < 2
-					? undefined
-					: v > 0
-						? traffic.vehicles[v - 1]
-						: traffic.vehicles.at(-1);
+		for (const lane of ['cw', 'ccw']) {
+			const laneVehicles = traffic.vehicles.filter((vehicle) => vehicle.lane === lane);
+			for (let v = 0; v < laneVehicles.length; v++) {
+				const vehicle = laneVehicles[v];
+				const aheadVehicle =
+					laneVehicles.length < 2 ? undefined : (v > 0 ? laneVehicles[v - 1] : laneVehicles.at(-1));
 
-			const currentStatus = vehicle.getStatus();
-			const currentPoint = traffic.route.getPathPoint(currentStatus.position);
+				const currentStatus = vehicle.getStatus();
+				const currentPoint = traffic.route.getPathPoint(currentStatus.position);
 
-			vehicle.move(
-				aheadVehicle
-					? {
-							distance:
-								(aheadVehicle.getStatus().position +
-									aheadVehicle.getStatus().carDescriptor.shape.length -
-									currentStatus.position -
-									currentStatus.carDescriptor.shape.length +
-									pathLength) %
-								pathLength,
-							speed: aheadVehicle.getStatus().speed
-						}
-					: { distance: 1000, speed: 1000 },
-				{ radius: currentPoint.radius },
-				currentPoint.nextCurve,
-				timeScale
-			);
+				vehicle.move(
+					aheadVehicle
+						? {
+								distance:
+									(lane === 'cw'
+										? (aheadVehicle.getStatus().position - currentStatus.position + pathLength) %
+											pathLength
+										: (currentStatus.position - aheadVehicle.getStatus().position + pathLength) %
+											pathLength) +
+									aheadVehicle.getStatus().carDescriptor.shape.length +
+									currentStatus.carDescriptor.shape.length,
+								speed: aheadVehicle.getStatus().speed
+							}
+						: undefined,
+					{ radius: currentPoint.radius },
+					currentPoint.nextCurveCw,
+					currentPoint.nextCurveCcw,
+					timeScale
+				);
 
-			const updatedStatus = vehicle.getStatus();
-			positions.set(vehicle, {
-				...updatedStatus,
-				point: traffic.route.getPathPoint(updatedStatus.position)
-			});
+				const updatedStatus = vehicle.getStatus();
+				positions.set(vehicle, {
+					...updatedStatus,
+					point: traffic.route.getPathPoint(updatedStatus.position)
+				});
+			}
 		}
 	}, 10);
 
@@ -82,26 +83,26 @@
 
 <div class="flex justify-center">
 	<Stage
-		width={PIXEL_PER_METER * box.width * (zoom / 100)}
-		height={PIXEL_PER_METER * box.height * (zoom / 100)}
+		width={WORLD_PIXEL_PER_METER * box.width * (zoom / 100)}
+		height={WORLD_PIXEL_PER_METER * box.height * (zoom / 100)}
 		scaleX={zoom / 100}
 		scaleY={zoom / 100}
-		offsetX={PIXEL_PER_METER * box.offsetX}
-		offsetY={PIXEL_PER_METER * box.offsetY}
+		offsetX={WORLD_PIXEL_PER_METER * box.offsetX}
+		offsetY={WORLD_PIXEL_PER_METER * box.offsetY}
 	>
 		<Layer>
 			<Rect
 				id="background"
-				x={PIXEL_PER_METER * box.offsetX}
-				y={PIXEL_PER_METER * box.offsetY}
-				width={PIXEL_PER_METER * box.width}
-				height={PIXEL_PER_METER * box.height}
+				x={WORLD_PIXEL_PER_METER * box.offsetX}
+				y={WORLD_PIXEL_PER_METER * box.offsetY}
+				width={WORLD_PIXEL_PER_METER * box.width}
+				height={WORLD_PIXEL_PER_METER * box.height}
 				fill="#7a7"
 				stroke="#888"
 			/>
-			<RoadShape route={traffic.route} pixelPerMeter={PIXEL_PER_METER} />
+			<RoadShape route={traffic.route} />
 			{#each positions.values() as drawingData}
-				<VehicleShape {drawingData} pixelPerMeter={PIXEL_PER_METER} />
+				<VehicleShape {drawingData} />
 			{/each}
 		</Layer>
 	</Stage>
