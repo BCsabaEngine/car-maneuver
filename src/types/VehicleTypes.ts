@@ -13,6 +13,7 @@ export type VehicleDescriptor = {
 };
 
 export type VehicleStatus = {
+	lane: 'cw' | 'ccw';
 	position: number;
 	speed: number;
 	targetSpeed: number;

@@ -26,8 +26,10 @@ export const traffic = {
 		{ type: 'line', length: 10.2 }
 	]),
 	vehicles: [
-		new Vehicle('car', '#4c4', { maxSpeed: 100, maxAcceleration: 15, maxBreak: 25 }, 20),
-		new Vehicle('car', '#44c', { maxSpeed: 60, maxAcceleration: 20, maxBreak: 20 }, 10),
-		new Vehicle('truck', 'yellow', { maxSpeed: 80, maxAcceleration: 15, maxBreak: 20 }, 0)
+		new Vehicle('cw', 'car', 'green', { maxSpeed: 100, maxAcceleration: 15, maxBreak: 25 }, 20),
+		new Vehicle('cw', 'car', 'blue', { maxSpeed: 60, maxAcceleration: 20, maxBreak: 20 }, 10),
+		new Vehicle('cw', 'truck', 'yellow', { maxSpeed: 80, maxAcceleration: 15, maxBreak: 20 }, 5),
+
+		new Vehicle('ccw', 'truck', 'purple', { maxSpeed: 110, maxAcceleration: 20, maxBreak: 20 }, 0)
 	]
 };

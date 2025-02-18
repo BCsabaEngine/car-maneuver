@@ -16,6 +16,7 @@ export class Vehicle {
 	private acceleration = 0;
 
 	constructor(
+		public lane: 'cw' | 'ccw',
 		private carType: VehicleType,
 		private color: string,
 		private driveParameters: DriveParameters,
@@ -25,6 +26,7 @@ export class Vehicle {
 	}
 
 	public getStatus = (): VehicleStatus => ({
+		lane: this.lane,
 		position: Math.trunc(this.position),
 		speed: Math.trunc(this.speed),
 		targetSpeed: Math.trunc(this.targetSpeed),
@@ -51,20 +53,18 @@ export class Vehicle {
 		const elapsedSec = ((Date.now() - this.lastMove) / 1000) * (timeScalePercent / 100);
 		this.lastMove = Date.now();
 
-		this.position += this.speed * elapsedSec;
+		this.position += this.speed * elapsedSec * (this.lane === 'cw' ? 1 : -1);
 		this.speed += this.acceleration * elapsedSec;
 
 		const targetSpeeds = [this.driveParameters.maxSpeed];
 		if (
-			ahead.speed < this.speed &&
 			ahead.distance <
-				Math.max(
-					this.speed ** 2 / (2 * this.driveParameters.maxBreak),
-					vehicleDescriptors[this.carType].shape.length
-				) *
-					2
+			Math.max(
+				this.speed ** 2 / (2 * this.driveParameters.maxBreak),
+				vehicleDescriptors[this.carType].shape.length * 2
+			)
 		)
-			targetSpeeds.push(ahead.speed);
+			targetSpeeds.push(ahead.speed * 0.95);
 		if (currentCurve.radius) targetSpeeds.push(currentCurve.radius);
 		if (
 			nextCurve &&
@@ -73,7 +73,7 @@ export class Vehicle {
 		)
 			targetSpeeds.push(nextCurve.radius);
 
-		this.targetSpeed = Math.min(...targetSpeeds);
+		this.targetSpeed = Math.round(Math.min(...targetSpeeds));
 
 		if (this.speed === this.targetSpeed) this.hold();
 		else if (this.speed < this.targetSpeed)

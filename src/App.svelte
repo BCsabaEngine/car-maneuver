@@ -24,41 +24,40 @@
 	const positions: Map<Vehicle, DrawingData> = new SvelteMap();
 
 	setInterval(() => {
-		for (let v = 0; v < traffic.vehicles.length; v++) {
-			const vehicle = traffic.vehicles[v];
-			const aheadVehicle =
-				traffic.vehicles.length < 2
-					? undefined
-					: (v > 0
-						? traffic.vehicles[v - 1]
-						: traffic.vehicles.at(-1));
+		for (const lane of ['cw', 'ccw']) {
+			const laneVehicles = traffic.vehicles.filter((vehicle) => vehicle.lane === lane);
+			for (let v = 0; v < laneVehicles.length; v++) {
+				const vehicle = laneVehicles[v];
+				const aheadVehicle =
+					laneVehicles.length < 2 ? undefined : (v > 0 ? laneVehicles[v - 1] : laneVehicles.at(-1));
 
-			const currentStatus = vehicle.getStatus();
-			const currentPoint = traffic.route.getPathPoint(currentStatus.position);
+				const currentStatus = vehicle.getStatus();
+				const currentPoint = traffic.route.getPathPoint(currentStatus.position);
 
-			vehicle.move(
-				aheadVehicle
-					? {
-							distance:
-								(aheadVehicle.getStatus().position +
-									aheadVehicle.getStatus().carDescriptor.shape.length -
-									currentStatus.position -
-									currentStatus.carDescriptor.shape.length +
-									pathLength) %
-								pathLength,
-							speed: aheadVehicle.getStatus().speed
-						}
-					: { distance: 1000, speed: 1000 },
-				{ radius: currentPoint.radius },
-				currentPoint.nextCurve,
-				timeScale
-			);
+				vehicle.move(
+					aheadVehicle
+						? {
+								distance:
+									(aheadVehicle.getStatus().position +
+										aheadVehicle.getStatus().carDescriptor.shape.length -
+										currentStatus.position -
+										currentStatus.carDescriptor.shape.length +
+										pathLength) %
+									pathLength,
+								speed: aheadVehicle.getStatus().speed
+							}
+						: { distance: 1000, speed: 1000 },
+					{ radius: currentPoint.radius },
+					currentPoint.nextCurve,
+					timeScale
+				);
 
-			const updatedStatus = vehicle.getStatus();
-			positions.set(vehicle, {
-				...updatedStatus,
-				point: traffic.route.getPathPoint(updatedStatus.position)
-			});
+				const updatedStatus = vehicle.getStatus();
+				positions.set(vehicle, {
+					...updatedStatus,
+					point: traffic.route.getPathPoint(updatedStatus.position)
+				});
+			}
 		}
 	}, 10);
 
@@ -101,7 +100,7 @@
 			/>
 			<RoadShape route={traffic.route} />
 			{#each positions.values() as drawingData}
-				<VehicleShape {drawingData} lane="cw" />
+				<VehicleShape {drawingData} />
 			{/each}
 		</Layer>
 	</Stage>

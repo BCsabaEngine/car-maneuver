@@ -52,7 +52,9 @@ export class Route {
 	}
 
 	public getPathPoint(distance: number): RoutePoint {
-		return this.pathPointsCache[Math.trunc(distance % this.pathLengthCache)];
+		while (distance < 0) distance += this.pathLengthCache;
+		const index = Math.trunc((distance + this.pathLengthCache) % this.pathLengthCache);
+		return this.pathPointsCache[index];
 	}
 
 	public get box() {

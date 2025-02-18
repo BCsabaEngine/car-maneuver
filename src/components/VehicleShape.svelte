@@ -8,10 +8,9 @@
 
 	interface Properties {
 		drawingData: DrawingData;
-		lane: 'cw' | 'ccw';
 	}
 
-	const { drawingData, lane }: Properties = $props();
+	const { drawingData }: Properties = $props();
 </script>
 
 <Shape
@@ -19,11 +18,11 @@
 	scaleY={WORLD_PIXEL_PER_METER}
 	x={(drawingData.point.x +
 		(ROAD_LANE_WIDTH_METER / 2) *
-			Math.cos(DegToRad(drawingData.point.angle + (lane === 'cw' ? 90 : -90)))) *
+			Math.cos(DegToRad(drawingData.point.angle + (drawingData.lane === 'cw' ? 90 : -90)))) *
 		WORLD_PIXEL_PER_METER}
 	y={(drawingData.point.y +
 		(ROAD_LANE_WIDTH_METER / 2) *
-			Math.sin(DegToRad(drawingData.point.angle + (lane === 'cw' ? 90 : -90)))) *
+			Math.sin(DegToRad(drawingData.point.angle + (drawingData.lane === 'cw' ? 90 : -90)))) *
 		WORLD_PIXEL_PER_METER}
 	rotation={drawingData.point.angle}
 	sceneFunc={(context) => {
@@ -35,8 +34,14 @@
 		context.stroke();
 		if (drawingData.isBreaking) {
 			context.beginPath();
-			context.moveTo(-drawingData.carDescriptor.shape.length / 2, 0);
-			context.lineTo(-drawingData.carDescriptor.shape.length / 2 + 1, 0);
+			context.moveTo(
+				((drawingData.lane === 'cw' ? -1 : 1) * drawingData.carDescriptor.shape.length) / 2,
+				0
+			);
+			context.lineTo(
+				((drawingData.lane === 'cw' ? -1 : 1) * drawingData.carDescriptor.shape.length) / 2 + 2,
+				0
+			);
 			context.lineWidth = drawingData.carDescriptor.shape.width;
 			context.strokeStyle = 'red';
 			context.stroke();
