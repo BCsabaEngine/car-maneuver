@@ -59,23 +59,15 @@ export class Vehicle {
 
 		const targetSpeeds = [this.driveParameters.maxSpeed];
 
-		if (ahead)
-			if (
-				Math.abs(ahead.distance) <
-				Math.min(
+		if (
+			ahead &&
+			Math.abs(ahead.distance) <
+				Math.max(
 					this.speed ** 2 / (2 * this.driveParameters.maxBreak),
-					vehicleDescriptors[this.carType].shape.length
+					vehicleDescriptors[this.carType].shape.length * 3
 				)
-			)
-				targetSpeeds.push(0);
-			else if (
-				Math.abs(ahead.distance) <
-				Math.min(
-					this.speed ** 2 / (2 * this.driveParameters.maxBreak),
-					vehicleDescriptors[this.carType].shape.length * 2
-				)
-			)
-				targetSpeeds.push(0); //ahead.speed * 0.8
+		)
+			targetSpeeds.push(0);
 
 		if (currentCurve.radius) targetSpeeds.push(currentCurve.radius);
 
