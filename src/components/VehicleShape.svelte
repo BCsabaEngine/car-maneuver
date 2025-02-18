@@ -32,6 +32,23 @@
 		context.lineWidth = drawingData.carDescriptor.shape.width;
 		context.strokeStyle = drawingData.color;
 		context.stroke();
+
+		context.beginPath();
+		for (const x of [-1, 1])
+			for (const y of [-1, 1]) {
+				context.moveTo(
+					(y * drawingData.carDescriptor.shape.length) / 3 - 1,
+					(x * drawingData.carDescriptor.shape.width) / 2
+				);
+				context.lineTo(
+					(y * drawingData.carDescriptor.shape.length) / 3 + 1,
+					(x * drawingData.carDescriptor.shape.width) / 2
+				);
+			}
+		context.lineWidth = 1;
+		context.strokeStyle = 'black';
+		context.stroke();
+
 		if (drawingData.isBreaking) {
 			context.beginPath();
 			context.moveTo(
