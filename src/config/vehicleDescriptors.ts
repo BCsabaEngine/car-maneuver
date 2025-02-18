@@ -18,5 +18,14 @@ export const vehicleDescriptors: Record<VehicleType, VehicleDescriptor> = {
 			width: 5,
 			length: 9
 		}
+	},
+	bus: {
+		engine: {
+			breakAcceleration: 1
+		},
+		shape: {
+			width: 5,
+			length: 15
+		}
 	}
 };
