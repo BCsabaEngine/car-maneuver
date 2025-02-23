@@ -52,12 +52,22 @@
 					}
 				}
 			}
-			context.lineWidth =
-				part === 'border'
-					? ROAD_LANE_WIDTH_METER * 2 + ROAD_MARGIN_WIDTH_PX * 2
-					: (part === 'road'
-						? ROAD_LANE_WIDTH_METER * 2
-						: ROAD_DIVIDING_LINE_WIDTH_PX);
+			switch (part) {
+				case 'border': {
+					context.lineWidth = ROAD_LANE_WIDTH_METER * 2 + ROAD_MARGIN_WIDTH_PX * 2;
+					break;
+				}
+
+				case 'road': {
+					context.lineWidth = ROAD_LANE_WIDTH_METER * 2;
+					break;
+				}
+
+				default: {
+					context.lineWidth = ROAD_DIVIDING_LINE_WIDTH_PX;
+					break;
+				}
+			}
 			context.strokeStyle = part === 'border' ? '#ccc' : (part === 'road' ? '#888' : '#fff');
 			context.stroke();
 		}

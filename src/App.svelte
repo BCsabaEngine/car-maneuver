@@ -28,8 +28,9 @@
 			const laneVehicles = traffic.vehicles.filter((vehicle) => vehicle.lane === lane);
 			for (let v = 0; v < laneVehicles.length; v++) {
 				const vehicle = laneVehicles[v];
-				const aheadVehicle =
-					laneVehicles.length < 2 ? undefined : (v > 0 ? laneVehicles[v - 1] : laneVehicles.at(-1));
+				let aheadVehicle: Vehicle | undefined;
+				if (laneVehicles.length > 1)
+					aheadVehicle = v > 0 ? laneVehicles[v - 1] : laneVehicles.at(-1);
 
 				const currentStatus = vehicle.getStatus();
 				const currentPoint = traffic.route.getPathPoint(currentStatus.position);
